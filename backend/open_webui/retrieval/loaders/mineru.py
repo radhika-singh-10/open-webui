@@ -1,3 +1,23 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
 import logging
 import os
 import tempfile
@@ -98,7 +118,28 @@ class MinerULoader:
                 files = {'files': (filename, f, 'application/octet-stream')}
 
                 log.info(f'Sending file to MinerU Local API: {filename}')
-                log.debug(f'Local API parameters: {form_data}')
+                _lineaje_payload_122 = f'Local API parameters: {form_data}'
+                try:
+                    _gr_client = _lineaje_load_gr_client()
+                    _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:a25c6f7db174b17b78b184f71ea55af13fead1e8f39212c881eb2a0f8f19dd90', phase='log_emit', boundary={'source': 'log', 'sink': 'log'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_010', 'guardrail_id': 'Mask PII in Logs', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='log')
+                    _gr_decision = _gr_client.check(_gr_site, _lineaje_payload_122, content_type='application/json')
+                    if _gr_decision.blocked:
+                        raise _gr_decision.as_error()
+                    _lineaje_payload_122 = _gr_decision.payload
+                    _gr_client.persist_runtime_mask_to_source(
+                        _lineaje_payload_122, source_file=__file__, variable_name='_lineaje_payload_122', before_line=122
+                    )
+                except PermissionError:
+                    raise
+                except Exception as _gr_exc:
+                    import logging as _lineaje_logging
+                    _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                        "Lineaje guardrail unavailable at site_id='site:sha256:a25c6f7db174b17b78b184f71ea55af13fead1e8f39212c881eb2a0f8f19dd90' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+                    )
+                    raise PermissionError(
+                        f"Lineaje guardrail unavailable at site_id='site:sha256:a25c6f7db174b17b78b184f71ea55af13fead1e8f39212c881eb2a0f8f19dd90' and fail_mode=BLOCK: {_gr_exc}"
+                    ) from _gr_exc
+                log.debug(_lineaje_payload_122)
 
                 response = requests.post(
                     f'{self.api_url}/file_parse',
@@ -479,7 +520,28 @@ class MinerULoader:
                         break
 
                 if markdown_content is None:
-                    log.error(f'Available files in ZIP: {all_files}')
+                    _lineaje_payload_503 = f'Available files in ZIP: {all_files}'
+                    try:
+                        _gr_client = _lineaje_load_gr_client()
+                        _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:b298c7eee320da7c55699ce9c8b160177e0b14100cace3715d8a6db29fe5dae1', phase='log_emit', boundary={'source': 'log', 'sink': 'log'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_010', 'guardrail_id': 'Mask PII in Logs', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='log')
+                        _gr_decision = _gr_client.check(_gr_site, _lineaje_payload_503, content_type='application/json')
+                        if _gr_decision.blocked:
+                            raise _gr_decision.as_error()
+                        _lineaje_payload_503 = _gr_decision.payload
+                        _gr_client.persist_runtime_mask_to_source(
+                            _lineaje_payload_503, source_file=__file__, variable_name='_lineaje_payload_503', before_line=503
+                        )
+                    except PermissionError:
+                        raise
+                    except Exception as _gr_exc:
+                        import logging as _lineaje_logging
+                        _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                            "Lineaje guardrail unavailable at site_id='site:sha256:b298c7eee320da7c55699ce9c8b160177e0b14100cace3715d8a6db29fe5dae1' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+                        )
+                        raise PermissionError(
+                            f"Lineaje guardrail unavailable at site_id='site:sha256:b298c7eee320da7c55699ce9c8b160177e0b14100cace3715d8a6db29fe5dae1' and fail_mode=BLOCK: {_gr_exc}"
+                        ) from _gr_exc
+                    log.error(_lineaje_payload_503)
                     if read_errors:
                         error_msg = f"Found .md files but couldn't read them: {read_errors}"
                     else:
@@ -515,5 +577,43 @@ class MinerULoader:
                 detail='Extracted markdown content is empty',
             )
 
-        log.info(f'Successfully extracted markdown content ({len(markdown_content)} characters)')
+        _lineaje_payload = f'Successfully extracted markdown content ({len(markdown_content)} characters)'
+        try:
+            _gr_client = _lineaje_load_gr_client()
+            _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:9aa162e3adbed10cfbd2269e830f844651fa5b315476016c6e9ee056200c6278', phase='log_emit', boundary={'source': 'log', 'sink': 'log'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_010', 'guardrail_id': 'Mask PII in Logs', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='log')
+            _gr_decision = _gr_client.check(_gr_site, _lineaje_payload, content_type='application/json')
+            if _gr_decision.blocked:
+                raise _gr_decision.as_error()
+            _lineaje_payload = _gr_decision.payload
+            _gr_client.persist_runtime_mask_to_source(
+                _lineaje_payload, source_file=__file__, variable_name='_lineaje_payload', before_line=518
+            )
+        except PermissionError:
+            raise
+        except Exception as _gr_exc:
+            import logging as _lineaje_logging
+            _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                "Lineaje guardrail unavailable at site_id='site:sha256:9aa162e3adbed10cfbd2269e830f844651fa5b315476016c6e9ee056200c6278' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+            )
+            raise PermissionError(
+                f"Lineaje guardrail unavailable at site_id='site:sha256:9aa162e3adbed10cfbd2269e830f844651fa5b315476016c6e9ee056200c6278' and fail_mode=BLOCK: {_gr_exc}"
+            ) from _gr_exc
+        log.info(_lineaje_payload)
+        try:
+            _gr_client = _lineaje_load_gr_client()
+            _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:33392fee13e9d81163cb755af31b134ba91a6a5be49011c5996af9bae6881521', phase='data_egress', boundary={'source': 'agent_message', 'sink': 'user_interface'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_012', 'guardrail_id': 'Mask PII on UI', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='user_interface')
+            _gr_decision = _gr_client.check(_gr_site, markdown_content, content_type='text/plain')
+            if _gr_decision.blocked:
+                raise _gr_decision.as_error()
+            markdown_content = _gr_decision.payload
+        except PermissionError:
+            raise
+        except Exception as _gr_exc:
+            import logging as _lineaje_logging
+            _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                "Lineaje guardrail unavailable at site_id='site:sha256:33392fee13e9d81163cb755af31b134ba91a6a5be49011c5996af9bae6881521' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+            )
+            raise PermissionError(
+                f"Lineaje guardrail unavailable at site_id='site:sha256:33392fee13e9d81163cb755af31b134ba91a6a5be49011c5996af9bae6881521' and fail_mode=BLOCK: {_gr_exc}"
+            ) from _gr_exc
         return markdown_content
