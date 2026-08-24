@@ -1,3 +1,23 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
 import logging
 import time
 import uuid
@@ -100,6 +120,24 @@ class SharedChatsTable:
                 return None
 
             chat = await db.get(Chat, shared_chat.chat_id)
+            try:
+                _gr_client = _lineaje_load_gr_client()
+                _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:55d7abb8aeb5208862d344b2a9940a5a60f8b563f4de130025caa8ab5ea6d1e2', phase='post_tool', boundary={'source': 'external_endpoint', 'sink': 'agent_message'}, candidate_policies=[], fail_mode='ALLOW_WITH_AUDIT', source_type='api', destination_type='agent')
+                import asyncio as _gr_asyncio
+                _gr_decision = await _gr_asyncio.to_thread(lambda: _gr_client.check(_gr_site, chat, content_type='application/json'))
+                if _gr_decision.blocked:
+                    raise _gr_decision.as_error()
+                chat = _gr_decision.payload
+                _gr_client.persist_runtime_mask_to_source(
+                    chat, source_file=__file__, variable_name='chat', before_line=102
+                )
+            except PermissionError:
+                raise
+            except Exception as _gr_exc:
+                import logging as _lineaje_logging
+                _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                    "Lineaje guardrail unavailable at site_id='site:sha256:55d7abb8aeb5208862d344b2a9940a5a60f8b563f4de130025caa8ab5ea6d1e2' (%s) — passing data through unchecked", _gr_exc
+                )
             if not chat:
                 return None
 
@@ -125,6 +163,24 @@ class SharedChatsTable:
             result = await db.execute(
                 select(SharedChat).filter_by(chat_id=chat_id).order_by(SharedChat.updated_at.desc()).limit(1)
             )
+            try:
+                _gr_client = _lineaje_load_gr_client()
+                _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:22d7362f2f1d5af06c0c07945fd970f57ffb840241471c15639bbc0d04b04844', phase='post_tool', boundary={'source': 'database', 'sink': 'agent_message'}, candidate_policies=[], fail_mode='ALLOW_WITH_AUDIT', source_type='database', destination_type='agent')
+                import asyncio as _gr_asyncio
+                _gr_decision = await _gr_asyncio.to_thread(lambda: _gr_client.check(_gr_site, result, content_type='application/json'))
+                if _gr_decision.blocked:
+                    raise _gr_decision.as_error()
+                result = _gr_decision.payload
+                _gr_client.persist_runtime_mask_to_source(
+                    result, source_file=__file__, variable_name='result', before_line=164
+                )
+            except PermissionError:
+                raise
+            except Exception as _gr_exc:
+                import logging as _lineaje_logging
+                _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                    "Lineaje guardrail unavailable at site_id='site:sha256:22d7362f2f1d5af06c0c07945fd970f57ffb840241471c15639bbc0d04b04844' (%s) — passing data through unchecked", _gr_exc
+                )
             shared_chat = result.scalars().first()
             if shared_chat:
                 return SharedChatModel.model_validate(shared_chat)
